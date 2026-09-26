@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Kiểm Tra Tổng Kết Học Phần 4: Hàm & Xử Lý Ngoại Lệ Trong Python</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #182234;
+            --bg-card-hover: #212f46;
+            --accent-blue: #38bdf8;
+            --accent-blue-glow: rgba(56, 189, 248, 0.25);
+            --accent-yellow: #facc15;
+            --accent-yellow-glow: rgba(250, 204, 21, 0.2);
+            --accent-green: #4ade80;
+            --accent-green-bg: rgba(74, 222, 128, 0.12);
+            --accent-red: #f87171;
+            --accent-red-bg: rgba(248, 113, 113, 0.12);
+            --accent-purple: #c084fc;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --border-color: #334155;
+            --border-focus: #38bdf8;
+            --code-bg: #090d16;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow-glow: 0 0 25px rgba(56, 189, 248, 0.15);
+            --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(250, 204, 21, 0.04) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* Utility Components */
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-easy { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
+        .badge-medium { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.3); }
+        .badge-hard { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
+        .badge-essay { background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            color: #0f172a;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+            background: linear-gradient(135deg, #7dd3fc 0%, #0369a1 100%);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+            color: #ffffff;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%);
+            color: #0f172a;
+            box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 222, 128, 0.5);
+        }
+
+        /* Monospace & Code Block Styling */
+        pre, code {
+            font-family: 'Fira Code', monospace;
+        }
+
+        .code-block {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-blue);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin: 12px 0;
+            overflow-x: auto;
+            font-size: 0.92rem;
+            color: #e2e8f0;
+            white-space: pre;
+            line-height: 1.5;
+        }
+
+        /* Syntax Highlight Colors in Code Blocks */
+        .code-block .k { color: #f472b6; font-weight: 600; } /* Keyword */
+        .code-block .f { color: #38bdf8; } /* Function */
+        .code-block .s { color: #4ade80; } /* String */
+        .code-block .c { color: #64748b; font-style: italic; } /* Comment */
+        .code-block .n { color: #facc15; } /* Number */
+
+        /* ================= START SCREEN ================= */
+        #start-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 90vh;
+            padding: 20px;
+        }
+
+        .start-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            max-width: 750px;
+            width: 100%;
+            box-shadow: var(--shadow-card), var(--shadow-glow);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #38bdf8, #facc15, #4ade80);
+        }
+
+        .start-logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px auto;
+            background: rgba(56, 189, 248, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .start-logo svg {
+            width: 40px;
+            height: 40px;
+            fill: var(--accent-blue);
+        }
+
+        .start-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .start-subtitle {
+            font-size: 1rem;
+            color: var(--accent-blue);
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .exam-info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .info-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .info-box-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-yellow);
+        }
+
+        .info-box-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .rules-list {
+            text-align: left;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: var(--radius-md);
+            padding: 20px 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .rules-list h4 {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rules-list ul {
+            list-style: none;
+        }
+
+        .rules-list li {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .rules-list li::before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px var(--accent-blue-glow);
+        }
+
+        /* ================= STICKY HEADER (EXAM MODE) ================= */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .header-title-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .timer-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(250, 204, 21, 0.1);
+            border: 1px solid rgba(250, 204, 21, 0.4);
+            padding: 8px 16px;
+            border-radius: 30px;
+            color: var(--accent-yellow);
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .timer-badge.warning {
+            background: rgba(248, 113, 113, 0.2);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+            animation: pulse-red 1s infinite alternate;
+        }
+
+        @keyframes pulse-red {
+            from { box-shadow: 0 0 5px rgba(248, 113, 113, 0.2); }
+            to { box-shadow: 0 0 15px rgba(248, 113, 113, 0.6); }
+        }
+
+        .header-progress {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .progress-bar-bg {
+            width: 140px;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #38bdf8, #4ade80);
+            transition: width 0.3s ease;
+        }
+
+        /* ================= EXAM CONTENT AREA ================= */
+        .exam-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .exam-sidebar {
+            position: sticky;
+            top: 85px;
+            height: calc(100vh - 105px);
+            overflow-y: auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .nav-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .nav-item:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-main);
+        }
+
+        .nav-item.answered {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .nav-item.essay-answered {
+            background: rgba(192, 132, 252, 0.2);
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+        }
+
+        .question-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-card);
+            transition: var(--transition);
+            scroll-margin-top: 90px;
+        }
+
+        .question-card:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .question-number {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .question-text {
+            font-size: 1.02rem;
+            color: var(--text-main);
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .option-label:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(56, 189, 248, 0.5);
+        }
+
+        .option-label input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-muted);
+            border-radius: 50%;
+            outline: none;
+            margin-top: 2px;
+            flex-shrink: 0;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .option-label input[type="radio"]:checked {
+            border-color: var(--accent-blue);
+            background: var(--accent-blue);
+            box-shadow: 0 0 10px var(--accent-blue-glow);
+        }
+
+        .option-label input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: #0f172a;
+            border-radius: 50%;
+        }
+
+        .option-label.selected {
+            border-color: var(--accent-blue);
+            background: rgba(56, 189, 248, 0.08);
+        }
+
+        .option-key {
+            font-weight: 700;
+            color: var(--accent-blue);
+            min-width: 24px;
+        }
+
+        .option-text {
+            font-size: 0.95rem;
+            color: var(--text-main);
+            flex-grow: 1;
+        }
+
+        /* Essay Textarea Styling */
+        .essay-input {
+            width: 100%;
+            min-height: 180px;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            color: #f8fafc;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: vertical;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .essay-input:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.25);
+        }
+
+        .essay-hint {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .submit-section {
+            margin: 40px 0 60px 0;
+            text-align: center;
+        }
+
+        /* ================= RESULT SCREEN ================= */
+        .result-container {
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+
+        .result-header-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 35px;
+            text-align: center;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--bg-secondary) 60%, transparent 61%),
+                        conic-gradient(var(--accent-blue) calc(var(--score-pct) * 1%), var(--border-color) 0);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            border: 4px solid var(--bg-card);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+        }
+
+        .score-val {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1;
+        }
+
+        .score-total {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .score-grade {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-yellow);
+            margin-top: 10px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .stat-card-val {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .stat-card-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .filter-tab-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--accent-blue);
+        }
+
+        /* Review Item Specifics */
+        .review-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .review-card.correct {
+            border-left: 5px solid var(--accent-green);
+        }
+
+        .review-card.incorrect {
+            border-left: 5px solid var(--accent-red);
+        }
+
+        .review-card.essay-item {
+            border-left: 5px solid var(--accent-purple);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .status-pill.pass { background: var(--accent-green-bg); color: var(--accent-green); }
+        .status-pill.fail { background: var(--accent-red-bg); color: var(--accent-red); }
+
+        .explanation-box {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px dashed var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .explanation-box h5 {
+            color: var(--accent-yellow);
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .essay-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .essay-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 15px;
+        }
+
+        .essay-box h6 {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Modal Confirmation */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-card);
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(250, 204, 21, 0.15);
+            color: var(--accent-yellow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px auto;
+            font-size: 1.8rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            justify-content: center;
+        }
+
+        /* Responsive Layout Adjustments */
+        @media (max-width: 900px) {
+            .exam-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .exam-sidebar {
+                position: static;
+                height: auto;
+                margin-bottom: 20px;
+            }
+
+            .nav-grid {
+                grid-template-columns: repeat(10, 1fr);
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .essay-comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .exam-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .nav-grid {
+                grid-template-columns: repeat(6, 1fr);
+            }
+            
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .header-progress {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .start-card {
+                padding: 25px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= START SCREEN ================= -->
+    <div id="start-screen">
+        <div class="start-card">
+            <div class="start-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+            </div>
+            <h1 class="start-title">BÀI KIỂM TRA TỔNG KẾT HỌC PHẦN 4</h1>
+            <p class="start-subtitle">Hàm, Phạm Vi Biến & Xử Lý Ngoại Lệ Trong Ứng Dụng GUI Python</p>
+            
+            <div class="input-group">
+                <label for="student-name">Họ và tên học viên:</label>
+                <input type="text" id="student-name" placeholder="Nhập họ và tên của bạn..." autocomplete="off">
+            </div>
+
+            <div class="exam-info-grid">
+                <div class="info-box">
+                    <div class="info-box-value">30</div>
+                    <div class="info-box-label">Câu Trắc Nghiệm</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-box-value">03</div>
+                    <div class="info-box-label">Bài Tự Luận Code</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-box-value">90:00</div>
+                    <div class="info-box-label">Thời Gian Làm Bài</div>
+                </div>
+            </div>
+
+            <div class="rules-list">
+                <h4>📌 Hướng dẫn & Quy định làm bài:</h4>
+                <ul>
+                    <li>Bài thi gồm 30 câu trắc nghiệm (10 dễ, 10 trung bình, 10 khó) và 3 câu tự luận lập trình.</li>
+                    <li>Thời gian đếm ngược 90 phút sẽ bắt đầu ngay khi bạn bấm nút bên dưới.</li>
+                    <li>Trong quá trình làm bài, hệ thống <strong>không hiển thị đáp án đúng/sai</strong>. Kết quả sẽ được chấm sau khi bạn nộp bài hoặc khi hết giờ.</li>
+                    <li>Khi hết thời gian 90:00, bài làm sẽ tự động nộp ngay lập tức.</li>
+                    <li>Hãy kiểm tra kỹ bài làm trước khi bấm "Nộp bài".</li>
+                </ul>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; padding: 16px;" onclick="startExam()">
+                🚀 BẮT ĐẦU LÀM BÀI THI
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= STICKY HEADER (EXAM MODE) ================= -->
+    <header class="sticky-header" id="exam-header" style="display: none;">
+        <div class="container header-content">
+            <div class="header-title-box">
+                <span class="badge badge-medium">Python Lớp 4</span>
+                <span class="header-title" id="display-student-name">Học Viên</span>
+            </div>
+
+            <div class="timer-badge" id="timer-badge">
+                ⏱️ <span id="timer-text">90:00</span>
+            </div>
+
+            <div class="header-progress">
+                <span class="progress-text" id="progress-text">0 / 33 đã hoàn thành</span>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= EXAM MAIN SCREEN ================= -->
+    <main class="container" id="exam-screen" style="display: none;">
+        <div class="exam-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="exam-sidebar">
+                <div class="sidebar-section-title">Trắc Nghiệm (1-30)</div>
+                <div class="nav-grid" id="mcq-nav-grid">
+                    <!-- Dynamic Nav Items 1-30 -->
+                </div>
+
+                <div class="sidebar-section-title" style="margin-top: 15px;">Tự Luận (31-33)</div>
+                <div class="nav-grid" id="essay-nav-grid">
+                    <!-- Dynamic Nav Items 31-33 -->
+                </div>
+
+                <div style="margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color);">
+                    <button class="btn btn-success" style="width: 100%;" onclick="openSubmitModal()">
+                        📝 Nộp Bài Thi
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Questions Main Content -->
+            <section id="questions-container">
+                <!-- Dynamic Question Cards rendered via JavaScript -->
+            </section>
+        </div>
+
+        <div class="submit-section">
+            <button class="btn btn-success" style="padding: 16px 40px; font-size: 1.1rem;" onclick="openSubmitModal()">
+                ✅ NỘP BÀI THI VÀ XEM KẾT QUẢ
+            </button>
+        </div>
+    </main>
+
+    <!-- ================= RESULT SCREEN ================= -->
+    <div class="container result-container" id="result-screen" style="display: none;">
+        <div class="result-header-card">
+            <h2 style="font-size: 1.8rem; margin-bottom: 5px;">KẾT QUẢ BÀI KIỂM TRA</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;" id="result-student-info">Học viên: ...</p>
+
+            <div class="score-circle" id="score-circle" style="--score-pct: 0;">
+                <div class="score-val" id="score-val-10">0.0</div>
+                <div class="score-total">Thang điểm 10</div>
+            </div>
+
+            <div class="score-grade" id="score-grade-text">Đánh giá: ...</div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-card-val" style="color: var(--accent-green);" id="stat-correct-count">0 / 30</div>
+                    <div class="stat-card-label">Số câu trắc nghiệm đúng</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-val" style="color: var(--accent-blue);" id="stat-score-100">0 / 100</div>
+                    <div class="stat-card-label">Điểm quy đổi (100đ)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-val" style="color: var(--accent-yellow);" id="stat-time-spent">00:00</div>
+                    <div class="stat-card-label">Thời gian làm bài</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-val" style="color: var(--accent-purple);" id="stat-unanswered">0</div>
+                    <div class="stat-card-label">Số câu chưa làm</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Tab -->
+        <div class="filter-tab-bar">
+            <button class="tab-btn active" onclick="filterReview('all', this)">Tất Cả Câu Hỏi</button>
+            <button class="tab-btn" onclick="filterReview('correct', this)">Câu Trắc Nghiệm Đúng</button>
+            <button class="tab-btn" onclick="filterReview('incorrect', this)">Câu Trắc Nghiệm Sai</button>
+            <button class="tab-btn" onclick="filterReview('essay', this)">Bài Tự Luận</button>
+        </div>
+
+        <!-- Review Items Container -->
+        <div id="review-container">
+            <!-- Dynamic Review Items -->
+        </div>
+
+        <div style="text-align: center; margin: 40px 0;">
+            <button class="btn btn-primary" onclick="window.location.reload()">
+                🔄 Làm Lại Bài Kiểm Tra
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= CONFIRM MODAL ================= -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-card">
+            <div class="modal-icon">⚠️</div>
+            <h3 style="margin-bottom: 10px; color: var(--text-main);">Xác Nhận Nộp Bài?</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem;" id="modal-status-text">
+                Bạn vẫn còn thời gian làm bài. Bạn có chắc chắn muốn nộp bài thi ngay bây giờ?
+            </p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeSubmitModal()">Hủy, Làm Tiếp</button>
+                <button class="btn btn-success" onclick="confirmSubmit()">Xác Nhận Nộp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT DATA & LOGIC ================= -->
+    <script>
+        /* ----------------------------------------------------
+           DATA STRUCTURE: 30 MCQs & 3 Essay Questions
+           ---------------------------------------------------- */
+        const mcqQuestions = [
+            // --- DỄ (1 - 10) ---
+            {
+                id: 1,
+                difficulty: "easy",
+                question: "Từ khóa nào trong Python được sử dụng để bắt đầu định nghĩa một hàm?",
+                code: null,
+                options: [
+                    "def",
+                    "func",
+                    "function",
+                    "define"
+                ],
+                correct: 0,
+                explanation: "Trong Python, từ khóa `def` (viết tắt của define) được dùng để khai báo định nghĩa một hàm."
+            },
+            {
+                id: 2,
+                difficulty: "easy",
+                question: "Nếu một hàm Python kết thúc mà không thực thi bất kỳ câu lệnh `return` nào, giá trị mặc định được trả về là gì?",
+                code: null,
+                options: [
+                    "0",
+                    "False",
+                    "None",
+                    "undefined"
+                ],
+                correct: 2,
+                explanation: "Mọi hàm trong Python nếu không có lệnh `return` cụ thể hoặc lệnh `return` không đi kèm giá trị thì mặc định trả về đối tượng `None`."
+            },
+            {
+                id: 3,
+                difficulty: "easy",
+                question: "Cú pháp nào sau đây thể hiện việc truyền đối số theo tên (Keyword Argument) khi gọi hàm `power(base, exponent)`?",
+                code: null,
+                options: [
+                    "power(2, 8)",
+                    "power(base=2, exponent=8)",
+                    "power(int base=2, int exponent=8)",
+                    "power(2 -> base, 8 -> exponent)"
+                ],
+                correct: 1,
+                explanation: "Keyword argument cho phép chỉ định rõ tên tham số nhận giá trị theo cú pháp `tên_tham_số = giá_trị` khi gọi hàm."
+            },
+            {
+                id: 4,
+                difficulty: "easy",
+                question: "Lỗi nào sẽ phát sinh nếu bạn gọi một hàm mà không truyền đủ số lượng positional arguments bắt buộc?",
+                code: null,
+                options: [
+                    "TypeError",
+                    "ValueError",
+                    "ArgumentError",
+                    "SyntaxError"
+                ],
+                correct: 0,
+                explanation: "Gọi hàm thiếu hoặc thừa số lượng đối số so với định nghĩa sẽ phát sinh lỗi `TypeError: missing required positional argument`."
+            },
+            {
+                id: 5,
+                difficulty: "easy",
+                question: "Để thay đổi giá trị của một biến toàn cục (global variable) từ bên trong phạm vi của một hàm, bạn cần dùng từ khóa nào?",
+                code: null,
+                options: [
+                    "extern",
+                    "static",
+                    "nonlocal",
+                    "global"
+                ],
+                correct: 3,
+                explanation: "Từ khóa `global` báo cho Python biết rằng biến được nhắc tới bên trong hàm chính là biến thuộc phạm vi toàn cục (global scope)."
+            },
+            {
+                id: 6,
+                difficulty: "easy",
+                question: "Ngoại lệ built-in nào phát sinh khi thực hiện phép tính chia một số cho 0 trong Python?",
+                code: null,
+                options: [
+                    "DivideError",
+                    "ZeroDivisionError",
+                    "MathError",
+                    "NullPointerError"
+                ],
+                correct: 1,
+                explanation: "Phép chia cho số 0 trong Python luôn phát sinh ngoại lệ `ZeroDivisionError`."
+            },
+            {
+                id: 7,
+                difficulty: "easy",
+                question: "Khi thực thi đoạn mã `int(\"python\")`, ngoại lệ nào sẽ xuất hiện?",
+                code: null,
+                options: [
+                    "TypeError",
+                    "CastError",
+                    "ValueError",
+                    "FormatError"
+                ],
+                correct: 2,
+                explanation: "`ValueError` xuất hiện khi hàm nhận đúng kiểu dữ liệu (chuỗi string) nhưng giá trị không phù hợp để chuyển đổi sang kiểu số nguyên."
+            },
+            {
+                id: 8,
+                difficulty: "easy",
+                question: "Trong cấu trúc `try-except-else-finally`, khối lệnh nằm trong `finally` có đặc điểm gì?",
+                code: null,
+                options: [
+                    "Luôn luôn được thực thi dù khối try có phát sinh lỗi hay không",
+                    "Chỉ thực thi khi có ngoại lệ xảy ra trong khối try",
+                    "Chỉ thực thi khi khối try chạy thành công không có lỗi",
+                    "Chỉ thực thi khi có lỗi chưa được xử lý ở ngoại lệ ngoại vi"
+                ],
+                correct: 0,
+                explanation: "Khối `finally` đảm bảo luôn chạy cuối cùng trong mọi trường hợp, thường dùng để dọn dẹp tài nguyên (đóng file, ngắt kết nối DB...)."
+            },
+            {
+                id: 9,
+                difficulty: "easy",
+                question: "Câu lệnh nào trong Python cho phép bạn chủ động tạo (ném) một ngoại lệ tại một thời điểm mong muốn?",
+                code: null,
+                options: [
+                    "throw",
+                    "emit",
+                    "dispatch",
+                    "raise"
+                ],
+                correct: 3,
+                explanation: "Trong Python, từ khóa `raise` được dùng để ném (trigger/raise) một ngoại lệ."
+            },
+            {
+                id: 10,
+                difficulty: "easy",
+                question: "Mục đích chính của câu lệnh `assert condition, \"Error message\"` trong Python là gì?",
+                code: null,
+                options: [
+                    "Ép kiểu dữ liệu của biến sang Boolean",
+                    "Kiểm tra điều kiện logic trong quá trình phát triển/debug; ném AssertionError nếu điều kiện sai",
+                    "Bắt lỗi ngoại lệ tự động mà không cần dùng khối try-except",
+                    "Tạo một hàm kiểm tra tự động chạy ngầm"
+                ],
+                correct: 1,
+                explanation: "Câu lệnh `assert` kiểm tra một điều kiện logic. Nếu điều kiện evaluated là `False`, Python lập tức ném ra ngoại lệ `AssertionError` kèm thông báo."
+            },
+
+            // --- TRUNG BÌNH (11 - 20) ---
+            {
+                id: 11,
+                difficulty: "medium",
+                question: "Dự đoán kết quả in ra màn hình của đoạn mã Python sau:",
+                code: `<span class="k">def</span> <span class="f">add_item</span>(item, lst=[]):
+    lst.append(item)
+    <span class="k">return</span> lst
+
+print(add_item(<span class="n">1</span>))
+print(add_item(<span class="n">2</span>))`,
+                options: [
+                    "[1] và [2]",
+                    "[1] và [1]",
+                    "[1] và [1, 2]",
+                    "[1, 2] và [1, 2]"
+                ],
+                correct: 2,
+                explanation: "Giá trị tham số mặc định dạng mutable (như list `lst=[]`) chỉ được khởi tạo **một lần duy nhất** khi hàm được định nghĩa. Lần gọi thứ 2 sẽ tiếp tục thêm phần tử vào danh sách cũ đó."
+            },
+            {
+                id: 12,
+                difficulty: "medium",
+                question: "Đoạn mã sau sẽ in ra kết quả gì khi chạy?",
+                code: `x = <span class="n">10</span>
+
+<span class="k">def</span> <span class="f">modify_scope</span>():
+    x = <span class="n">20</span>
+    print(x, end=<span class="s">" "</span>)
+
+modify_scope()
+print(x)`,
+                options: [
+                    "20 10",
+                    "20 20",
+                    "10 10",
+                    "10 20"
+                ],
+                correct: 0,
+                explanation: "Biến `x = 20` inside `modify_scope` là biến cục bộ (local variable) và làm ẩn (shadowing) biến toàn cục `x = 10`. Do đó inside hàm in 20, ngoài hàm `x` toàn cục vẫn giữ nguyên là 10."
+            },
+            {
+                id: 13,
+                difficulty: "medium",
+                question: "Chuyện gì xảy ra khi thực thi đoạn mã dưới đây?",
+                code: `count = <span class="n">5</span>
+
+<span class="k">def</span> <span class="f">increment</span>():
+    print(count)
+    count += <span class="n">1</span>
+
+increment()`,
+                options: [
+                    "In ra số 5 rồi tăng count lên 6",
+                    "Phát sinh lỗi UnboundLocalError",
+                    "Phát sinh lỗi NameError: count is not defined",
+                    "In ra 5 6"
+                ],
+                correct: 1,
+                explanation: "Do câu lệnh `count += 1` xuất hiện trong hàm, Python coi `count` là biến local cho toàn bộ hàm. Khi lệnh `print(count)` chạy trước câu lệnh gán, `count` local chưa được gán giá trị -> ném `UnboundLocalError`."
+            },
+            {
+                id: 14,
+                difficulty: "medium",
+                question: "Kết quả xuất ra màn hình của chương trình sau là gì?",
+                code: `<span class="k">try</span>:
+    res = <span class="n">10</span> / <span class="n">2</span>
+<span class="k">except</span> ZeroDivisionError:
+    print(<span class="s">"A"</span>, end=<span class="s">""</span>)
+<span class="k">else</span>:
+    print(<span class="s">"B"</span>, end=<span class="s">""</span>)
+<span class="k">finally</span>:
+    print(<span class="s">"C"</span>, end=<span class="s">""</span>)`,
+                options: [
+                    "ABC",
+                    "AC",
+                    "A",
+                    "BC"
+                ],
+                correct: 3,
+                explanation: "Phép tính `10 / 2` thành công không có lỗi -> Khối `except` bị bỏ qua -> Khối `else` chạy in 'B' -> Khối `finally` luôn chạy in 'C'. Kết quả: `BC`."
+            },
+            {
+                id: 15,
+                difficulty: "medium",
+                question: "Đoạn code sau đây sẽ in ra thông báo nào?",
+                code: `<span class="k">try</span>:
+    num = int(<span class="s">"python"</span>)
+<span class="k">except</span> Exception:
+    print(<span class="s">"Lỗi Chung"</span>, end=<span class="s">""</span>)
+<span class="k">except</span> ValueError:
+    print(<span class="s">"Lỗi Giá Trị"</span>, end=<span class="s">""</span>)`,
+                options: [
+                    "Lỗi Chung",
+                    "Lỗi Giá Trị",
+                    "Lỗi ChungLỗi Giá Trị",
+                    "Phát sinh lỗi SyntaxError"
+                ],
+                correct: 0,
+                explanation: "Python kiểm tra các khối `except` từ trên xuống dưới. Vì lớp cha `Exception` đặt trước `ValueError`, nó sẽ khớp và bắt lỗi ngay lập tức, làm cho khối `except ValueError` phía sau không bao giờ được chạm tới."
+            },
+            {
+                id: 16,
+                difficulty: "medium",
+                question: "Đoạn mã nào sau đây sẽ bị lỗi `SyntaxError` do vi phạm quy tắc gọi tham số?",
+                code: null,
+                options: [
+                    "def calc(a, b, c): return a+b+c; calc(1, 2, c=3)",
+                    "def calc(a, b, c): return a+b+c; calc(a=1, 2, 3)",
+                    "def calc(a, b, c): return a+b+c; calc(1, b=2, c=3)",
+                    "def calc(a, b, c): return a+b+c; calc(1, 2, 3)"
+                ],
+                correct: 1,
+                explanation: "Trong Python, đối số định vị (positional argument) **không bao giờ** được phép nằm sau đối số định danh (keyword argument). `calc(a=1, 2, 3)` gây lỗi SyntaxError."
+            },
+            {
+                id: 17,
+                difficulty: "medium",
+                question: "Cú pháp chuẩn nhất để tạo một ngoại lệ tùy chỉnh (Custom Exception) có tên `InvalidAgeError` là:",
+                code: null,
+                options: [
+                    "class InvalidAgeError: pass",
+                    "class InvalidAgeError(Exception): pass",
+                    "def InvalidAgeError(Exception): pass",
+                    "class InvalidAgeError(BaseError): pass"
+                ],
+                correct: 1,
+                explanation: "Mọi custom exception trong Python đều phải kế thừa trực tiếp hoặc gián tiếp từ lớp chuẩn `Exception`."
+            },
+            {
+                id: 18,
+                difficulty: "medium",
+                question: "Đoạn code sau đây truy cập dữ liệu Dictionary. Ngoại lệ nào sẽ xảy ra?",
+                code: `user = {<span class="s">"name"</span>: <span class="s">"Minh"</span>, <span class="s">"role"</span>: <span class="s">"Admin"</span>}
+print(user[<span class="s">"email"</span>])`,
+                options: [
+                    "IndexError",
+                    "AttributeError",
+                    "KeyError",
+                    "ValueError"
+                ],
+                correct: 2,
+                explanation: "Truy cập trực tiếp một key không tồn tại trong dictionary thông qua cặp ngoặc vuông `[]` sẽ ném ngoại lệ `KeyError`."
+            },
+            {
+                id: 19,
+                difficulty: "medium",
+                question: "Xét hàm kiểm tra số lượng tồn kho dưới đây. Nếu gọi `check_stock(-5)`, kết quả nhận được là gì?",
+                code: `<span class="k">def</span> <span class="f">check_stock</span>(qty):
+    <span class="k">if</span> qty < <span class="n">0</span>:
+        <span class="k">raise</span> ValueError(<span class="s">"Số lượng không được nhỏ hơn 0"</span>)
+    <span class="k">return</span> qty > <span class="n">0</span>`,
+                options: [
+                    "Ném ra ngoại lệ ValueError kèm thông báo 'Số lượng không được nhỏ hơn 0'",
+                    "Hàm trả về giá trị False",
+                    "Chương trình bị treo mà không báo lỗi",
+                    "Hàm trả về giá trị None"
+                ],
+                correct: 0,
+                explanation: "Do điều kiện `qty < 0` đúng (`-5 < 0`), câu lệnh `raise ValueError(...)` sẽ ném ngoại lệ `ValueError` với thông báo tương ứng."
+            },
+            {
+                id: 20,
+                difficulty: "medium",
+                question: "Trong ứng dụng GUI Tkinter (ví dụ app đổi tiền tệ), cách làm nào chuẩn nhất để xử lý khi người dùng nhập chuỗi không phải số vào ô Entry `entry_amount`?",
+                code: null,
+                options: [
+                    "Dùng khối try-except bắt ValueError xung quanh lệnh float(entry_amount.get()), hiển thị messagebox.showerror()",
+                    "Không cần xử lý vì Tkinter tự chuyển chuỗi thành số thực tự động",
+                    "Dùng lệnh if entry_amount.get() == None:",
+                    "Dùng vòng lặp while true để bắt người dùng nhập lại"
+                ],
+                correct: 0,
+                explanation: "Lấy chuỗi từ `Entry` bằng `.get()`, sau đó dùng `try: float(...) except ValueError:` và hiển thị hộp thoại `messagebox.showerror()` là chuẩn thiết kế GUI phòng chống crash app."
+            },
+
+            // --- KHÓ (21 - 30) ---
+            {
+                id: 21,
+                difficulty: "hard",
+                question: "Cho đoạn mã Python với phạm vi hàm lồng nhau (nested functions). Kết quả in ra là gì?",
+                code: `val = <span class="n">10</span>
+
+<span class="k">def</span> <span class="f">outer</span>():
+    val = <span class="n">20</span>
+    <span class="k">def</span> <span class="f">inner</span>():
+        <span class="k">global</span> val
+        val = <span class="n">30</span>
+    inner()
+    print(val, end=<span class="s">"-"</span>)
+
+outer()
+print(val)`,
+                options: [
+                    "20-30",
+                    "30-30",
+                    "30-20",
+                    "20-10"
+                ],
+                correct: 0,
+                explanation: "Hàm `inner` khai báo `global val`, do đó `val = 30` làm thay đổi biến global `val` ngoài cùng. Biến local `val = 20` thuộc hàm `outer` không bị ảnh hưởng. Vì vậy `outer` in `20`, lệnh print ngoài cùng in `30` -> `20-30`."
+            },
+            {
+                id: 22,
+                difficulty: "hard",
+                question: "Đoạn code xử lý ngoại lệ dưới đây trả về giá trị bao nhiêu khi gọi `calc(0)`?",
+                code: `<span class="k">def</span> <span class="f">calc</span>(n):
+    <span class="k">try</span>:
+        res = <span class="n">100</span> / n
+        <span class="k">return</span> res
+    <span class="k">except</span> ZeroDivisionError:
+        <span class="k">return</span> -<span class="n">1</span>
+    <span class="k">finally</span>:
+        <span class="k">return</span> <span class="n">999</span>
+
+print(calc(<span class="n">0</span>))`,
+                options: [
+                    "-1",
+                    "999",
+                    "0",
+                    "Phát sinh lỗi UnhandledException"
+                ],
+                correct: 1,
+                explanation: "Trong Python, câu lệnh `return` nằm trong khối `finally` sẽ **ghi đè (override)** mọi giá trị `return` hoặc ngoại lệ đã xảy ra trước đó trong `try` hay `except`. Do đó kết quả thu được luôn là `999`."
+            },
+            {
+                id: 23,
+                difficulty: "hard",
+                question: "Kết quả in ra của đoạn mã xử lý nhiều ngoại lệ dưới đây là gì?",
+                code: `<span class="k">try</span>:
+    data = int(<span class="s">"12.34"</span>)
+<span class="k">except</span> (TypeError, ValueError) <span class="k">as</span> err:
+    print(type(err).__name__, end=<span class="s">""</span>)`,
+                options: [
+                    "ValueError",
+                    "TypeError",
+                    "Exception",
+                    "TypeError, ValueError"
+                ],
+                correct: 0,
+                explanation: "Chuỗi `'12.34'` chứa dấu chấm thập phân nên hàm `int()` không ép kiểu trực tiếp được và ném ngoại lệ `ValueError`. Khối `except (TypeError, ValueError)` bắt được lỗi này và `type(err).__name__` in ra chuỗi `'ValueError'`."
+            },
+            {
+                id: 24,
+                difficulty: "hard",
+                question: "Dự đoán kết quả khi thực thi đoạn mã có sử dụng `assert` sau:",
+                code: `<span class="k">def</span> <span class="f">withdraw</span>(balance, amount):
+    <span class="k">assert</span> amount > <span class="n">0</span>, <span class="s">"Số tiền rút phải lớn hơn 0"</span>
+    <span class="k">assert</span> amount <= balance, <span class="s">"Số dư tài khoản không đủ"</span>
+    <span class="k">return</span> balance - amount
+
+<span class="k">try</span>:
+    withdraw(<span class="n">100</span>, <span class="n">150</span>)
+<span class="k">except</span> AssertionError <span class="k">as</span> e:
+    print(e)`,
+                options: [
+                    "Số tiền rút phải lớn hơn 0",
+                    "-50",
+                    "AssertionError",
+                    "Số dư tài khoản không đủ"
+                ],
+                correct: 3,
+                explanation: "Khi gọi `withdraw(100, 150)`, lệnh assert thứ nhất (`150 > 0`) vượt qua. Lệnh assert thứ hai (`150 <= 100`) bị sai (False) -> ném `AssertionError` với message `'Số dư tài khoản không đủ'`. Khối except bắt và in thông báo này."
+            },
+            {
+                id: 25,
+                difficulty: "hard",
+                question: "Xét cấu trúc try-except lồng nhau dưới đây. Màn hình sẽ hiển thị xâu ký tự nào?",
+                code: `<span class="k">try</span>:
+    <span class="k">try</span>:
+        a = <span class="n">10</span> / <span class="n">0</span>
+    <span class="k">except</span> ValueError:
+        print(<span class="s">"Val"</span>, end=<span class="s">""</span>)
+    <span class="k">finally</span>:
+        print(<span class="s">"Fin1"</span>, end=<span class="s">"-"</span>)
+<span class="k">except</span> ZeroDivisionError:
+    print(<span class="s">"Zero"</span>, end=<span class="s">""</span>)`,
+                options: [
+                    "Fin1-Zero",
+                    "ZeroFin1-",
+                    "ValFin1-Zero",
+                    "Fin1-"
+                ],
+                correct: 0,
+                explanation: "1. `10/0` gây `ZeroDivisionError` inside try trong.\n2. `except ValueError` không khớp nên không chạy.\n3. Khối `finally` bên trong chạy trước, in `'Fin1-'`.\n4. Ngoại lệ `ZeroDivisionError` tiếp tục lan truyền ra khối try ngoài và được `except ZeroDivisionError` bắt, in `'Zero'`.\nTổng kết: `Fin1-Zero`."
+            },
+            {
+                id: 26,
+                difficulty: "hard",
+                question: "Đoạn code đệ quy kết hợp try-except dưới đây sẽ trả về kết quả là bao nhiêu?",
+                code: `<span class="k">def</span> <span class="f">safe_sum</span>(n):
+    <span class="k">try</span>:
+        <span class="k">if</span> n == <span class="n">1</span>:
+            <span class="k">return</span> <span class="n">1</span>
+        <span class="k">return</span> n + safe_sum(n - <span class="n">1</span>)
+    <span class="k">except</span> Exception:
+        <span class="k">return</span> <span class="n">0</span>
+
+print(safe_sum(<span class="n">3</span>))`,
+                options: [
+                    "0",
+                    "6",
+                    "3",
+                    "None"
+                ],
+                correct: 1,
+                explanation: "Hàm tính tổng đệ quy bình thường: `3 + safe_sum(2)` -> `3 + 2 + safe_sum(1)` -> `3 + 2 + 1 = 6`. Trong quá trình chạy không phát sinh bất kỳ ngoại lệ nào nên kết quả hoàn toàn là 6."
+            },
+            {
+                id: 27,
+                difficulty: "hard",
+                question: "Giá trị in ra của hàm linh hoạt tham số `*args` và `**kwargs` dưới đây là:",
+                code: `<span class="k">def</span> <span class="f">compute</span>(*args, multiplier=<span class="n">2</span>, **kwargs):
+    total = sum(args) * multiplier
+    <span class="k">return</span> total + kwargs.get(<span class="s">'bonus'</span>, <span class="n">0</span>)
+
+print(compute(<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>, multiplier=<span class="n">3</span>, bonus=<span class="n">5</span>))`,
+                options: [
+                    "23",
+                    "17",
+                    "18",
+                    "25"
+                ],
+                correct: 0,
+                explanation: "`args` gom `(1, 2, 3)`. `sum(args) = 6`.\n`multiplier = 3` -> `total = 6 * 3 = 18`.\n`kwargs` nhận `{'bonus': 5}` -> `kwargs.get('bonus', 0) = 5`.\nTrả về `18 + 5 = 23`."
+            },
+            {
+                id: 28,
+                difficulty: "hard",
+                question: "Phát biểu nào đúng nhất về đoạn mã tính tổng danh sách dưới đây?",
+                code: `<span class="k">def</span> <span class="f">process_data</span>(data):
+    sum = <span class="n">0</span>
+    <span class="k">for</span> x <span class="k">in</span> data:
+        sum += x
+    <span class="k">return</span> sum
+
+print(process_data([<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>]))`,
+                options: [
+                    "Đoạn mã chạy bình thường ra 6, nhưng việc đặt tên biến local trùng `sum` sẽ che khuất (shadow) hàm built-in `sum()` trong scope của hàm này",
+                    "Bị lỗi TypeError ngay tại dòng sum = 0",
+                    "Bị lỗi NameError vì sum là từ khóa bảo mật của Python",
+                    "Chương trình gây lỗi hỏng hàm sum() trên toàn cục máy tính"
+                ],
+                correct: 0,
+                explanation: "Trong Python, việc đặt tên biến trùng với hàm built-in (như `sum`, `list`, `max`...) inside hàm không gây ra lỗi ngay lập tức, nhưng nó sẽ làm ẩn hàm built-in đó trong phạm vi cục bộ, khiến bạn không thể gọi `sum()` chuẩn trong hàm được nữa."
+            },
+            {
+                id: 29,
+                difficulty: "hard",
+                question: "Kết quả in ra của chương trình định nghĩa Custom Exception có thuộc tính riêng dưới đây là gì?",
+                code: `<span class="k">class</span> <span class="f">CurrencyError</span>(Exception):
+    <span class="k">def</span> <span class="f">__init__</span>(self, code, message):
+        self.code = code
+        self.message = message
+        super().__init__(f<span class="s">"[{code}] {message}"</span>)
+
+<span class="k">try</span>:
+    <span class="k">raise</span> CurrencyError(<span class="s">"ERR_01"</span>, <span class="s">"Tỷ giá không hợp lệ"</span>)
+<span class="k">except</span> CurrencyError <span class="k">as</span> e:
+    print(e.code, end=<span class="s">": "</span>)
+    print(e)`,
+                options: [
+                    "ERR_01: Tỷ giá không hợp lệ",
+                    "ERR_01: CurrencyError",
+                    "ERR_01: [ERR_01] Tỷ giá không hợp lệ",
+                    "Lỗi SyntaxError tại super().__init__"
+                ],
+                correct: 2,
+                explanation: "`e.code` in ra `'ERR_01'`. Đối tượng `e` khi ép chuỗi (print) gọi hàm `__str__` kế thừa từ `Exception`, hiển thị chuỗi format `f'[{code}] {message}'` tức `'[ERR_01] Tỷ giá không hợp lệ'`. Kết quả ghép lại: `ERR_01: [ERR_01] Tỷ giá không hợp lệ`."
+            },
+            {
+                id: 30,
+                difficulty: "hard",
+                question: "Đoạn mã làm việc với đối tượng có thể thay đổi (Mutable Object) trong try - finally sau sẽ in ra giá trị bao nhiêu?",
+                code: `<span class="k">def</span> <span class="f">demo</span>():
+    data = {<span class="s">"score"</span>: <span class="n">50</span>}
+    <span class="k">try</span>:
+        data[<span class="s">"score"</span>] = <span class="n">80</span>
+        <span class="k">return</span> data
+    <span class="k">finally</span>:
+        data[<span class="s">"score"</span>] = <span class="n">100</span>
+
+res = demo()
+print(res[<span class="s">"score"</span>])`,
+                options: [
+                    "50",
+                    "80",
+                    "None",
+                    "100"
+                ],
+                correct: 3,
+                explanation: "Khi `return data` được đánh giá, nó trả về địa chỉ tham chiếu (reference) tới dictionary `data`. Khối `finally` được thực thi **ngay trước khi** hàm hoàn toàn return và sửa giá trị bên trong dict `data['score'] = 100`. Vì dictionary là mutable object, sự thay đổi trong `finally` phản chiếu lên đối tượng nhận được `res` -> in ra `100`."
+            }
+        ];
+
+        const essayQuestions = [
+            {
+                id: 31,
+                title: "Câu 1 (Dễ): Viết Hàm Tính Điểm Trung Bình Môn Học",
+                prompt: `<p style="margin-bottom: 10px;"><strong>Đề bài:</strong> Viết một hàm Python có tên là <code>tinh_diem_tb(toan, van, anh)</code> nhận vào điểm số của 3 môn học.</p>
+<p style="margin-bottom: 6px;"><strong>Yêu cầu chi tiết:</strong></p>
+<div style="padding-left: 10px; line-height: 2.0; color: #e2e8f0;">
+🔹 <strong>Ý 1:</strong> Tính điểm trung bình cộng của 3 môn theo công thức: <code>(toan + van + anh) / 3</code>.<br>
+🔹 <strong>Ý 2:</strong> Nếu điểm trung bình lớn hơn hoặc bằng <code>5.0</code>, hàm trả về <code>True</code> (Đạt).<br>
+🔹 <strong>Ý 3:</strong> Ngược lại (điểm trung bình dưới 5.0), hàm trả về <code>False</code> (Không đạt).
+</div>`,
+                sampleAnswer: `def tinh_diem_tb(toan, van, anh):
+    dtb = (toan + van + anh) / 3
+    if dtb >= 5.0:
+        return True
+    else:
+        return False
+
+# Ví dụ chạy thử nghiệm:
+print(tinh_diem_tb(7, 8, 6))  # Trả về True (Đạt)
+print(tinh_diem_tb(4, 3, 5))  # Trả về False (Không đạt)`,
+                rubric: `
+- Ý 1: Khai báo tên hàm và tính đúng điểm trung bình cộng (toan + van + anh) / 3: 3.5 điểm
+- Ý 2: Kiểm tra điều kiện dtb >= 5.0 và trả về True: 3.5 điểm
+- Ý 3: Trả về False cho trường hợp còn lại: 3.0 điểm`
+            },
+            {
+                id: 32,
+                title: "Câu 2 (Trung bình): Xử Lý Ngoại Lệ Khi Nhập Tuổi Người Dùng",
+                prompt: `<p style="margin-bottom: 10px;"><strong>Đề bài:</strong> Viết đoạn chương trình Python nhập tuổi người dùng từ bàn phím bằng câu lệnh <code>input()</code> và ép kiểu sang số nguyên <code>int()</code>.</p>
+<p style="margin-bottom: 6px;"><strong>Yêu cầu chi tiết:</strong></p>
+<div style="padding-left: 10px; line-height: 2.0; color: #e2e8f0;">
+🔹 <strong>Ý 1:</strong> Sử dụng khối <code>try - except</code> để bắt lỗi <code>ValueError</code> nếu người dùng nhập chữ/ký tự không phải số nguyên.<br>
+🔹 <strong>Ý 2:</strong> Kiểm tra nếu tuổi nhập vào <code><= 0</code>, sử dụng câu lệnh <code>raise ValueError("Tuổi phải lớn hơn 0!")</code> để ném lỗi.<br>
+🔹 <strong>Ý 3:</strong> Nếu nhập tuổi hợp lệ (> 0), in thông báo: <code>"Tuổi của bạn là: {tuoi}"</code>.
+</div>`,
+                sampleAnswer: `try:
+    tuoi_str = input("Nhập tuổi của bạn: ")
+    tuoi = int(tuoi_str)
+    
+    if tuoi <= 0:
+        raise ValueError("Tuổi phải lớn hơn 0!")
+        
+    print(f"Tuổi của bạn là: {tuoi}")
+
+except ValueError as err:
+    print("Lỗi nhập liệu:", err)`,
+                rubric: `
+- Ý 1: Dùng khối try-except bắt lỗi ValueError khi ép kiểu chuỗi thành số nguyên: 3.5 điểm
+- Ý 2: Kiểm tra tuoi <= 0 và dùng raise ValueError ném thông báo lỗi: 3.5 điểm
+- Ý 3: In ra thông báo tuổi hợp lệ nếu dữ liệu nhập đúng: 3.0 điểm`
+            },
+            {
+                id: 33,
+                title: "Câu 3 (Tổng hợp GUI Tkinter): Kiểm Tra Mật Khẩu Đăng Nhập",
+                prompt: `<p style="margin-bottom: 10px;"><strong>Đề bài:</strong> Trong ứng dụng giao diện GUI Python Tkinter, viết hàm <code>kiem_tra_mat_khau(mat_khau)</code> dùng để kiểm tra độ an toàn của mật khẩu người dùng nhập vào từ ô Entry.</p>
+<p style="margin-bottom: 6px;"><strong>Yêu cầu chi tiết:</strong></p>
+<div style="padding-left: 10px; line-height: 2.0; color: #e2e8f0;">
+🔹 <strong>Ý 1:</strong> Nếu mật khẩu để trống (<code>mat_khau == ""</code>), hiển thị hộp thoại thông báo lỗi: <code>messagebox.showerror("Lỗi", "Mật khẩu không được để trống!")</code>.<br>
+🔹 <strong>Ý 2:</strong> Nếu độ dài mật khẩu dưới 6 ký tự (dùng hàm <code>len(mat_khau) < 6</code>), hiển thị cảnh báo: <code>messagebox.showwarning("Cảnh báo", "Mật khẩu quá ngắn, phải từ 6 ký tự trở lên!")</code>.<br>
+🔹 <strong>Ý 3:</strong> Nếu mật khẩu hợp lệ (từ 6 ký tự trở lên), hiển thị thông báo thành công: <code>messagebox.showinfo("Thành công", "Mật khẩu hợp lệ! Đăng nhập thành công.")</code>.
+</div>`,
+                sampleAnswer: `from tkinter import messagebox
+
+def kiem_tra_mat_khau(mat_khau):
+    if mat_khau == "":
+        messagebox.showerror("Lỗi", "Mật khẩu không được để trống!")
+    elif len(mat_khau) < 6:
+        messagebox.showwarning("Cảnh báo", "Mật khẩu quá ngắn, phải từ 6 ký tự trở lên!")
+    else:
+        messagebox.showinfo("Thành công", "Mật khẩu hợp lệ! Đăng nhập thành công.")
+
+# Ví dụ khi gắn vào nút bấm trên Tkinter GUI:
+# pwd = entry_password.get()
+# kiem_tra_mat_khau(pwd)`,
+                rubric: `
+- Ý 1: Kiểm tra mật khẩu rỗng và hiển thị messagebox.showerror(): 3.5 điểm
+- Ý 2: Kiểm tra len(mat_khau) < 6 và hiển thị messagebox.showwarning(): 3.5 điểm
+- Ý 3: Hiển thị messagebox.showinfo() khi mật khẩu hợp lệ: 3.0 điểm`
+            }
+        ];
+
+        /* ----------------------------------------------------
+           APPLICATION STATE & VARIABLES
+           ---------------------------------------------------- */
+        let studentName = "";
+        let timerInterval = null;
+        let timeRemaining = 90 * 60; // 90 minutes in seconds
+        let timeSpentSeconds = 0;
+        let userMcqAnswers = {}; // { questionId: optionIndex }
+        let userEssayAnswers = {}; // { essayId: text }
+        let isSubmitted = false;
+
+        /* ----------------------------------------------------
+           INITIALIZATION & NAVIGATION
+           ---------------------------------------------------- */
+        window.addEventListener('DOMContentLoaded', () => {
+            renderQuestionCards();
+            renderSidebarNav();
+        });
+
+        function startExam() {
+            const nameInput = document.getElementById('student-name').value.trim();
+            studentName = nameInput !== "" ? nameInput : "Học Viên Python";
+            document.getElementById('display-student-name').textContent = studentName;
+
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('exam-header').style.display = 'block';
+            document.getElementById('exam-screen').style.display = 'block';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Start countdown timer
+            startTimer();
+        }
+
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                timeSpentSeconds++;
+                updateTimerDisplay();
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    alert("⏰ Đã hết 90 phút làm bài! Hệ thống tự động nộp bài làm của bạn.");
+                    confirmSubmit(true);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeRemaining / 60);
+            const secs = timeRemaining % 60;
+            const formatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            const timerTextElem = document.getElementById('timer-text');
+            const timerBadge = document.getElementById('timer-badge');
+
+            timerTextElem.textContent = formatted;
+
+            // Warning style if under 10 minutes (600s)
+            if (timeRemaining <= 600) {
+                timerBadge.classList.add('warning');
+            }
+        }
+
+        /* ----------------------------------------------------
+           RENDER QUESTION CARDS & SIDEBAR NAV
+           ---------------------------------------------------- */
+        function renderSidebarNav() {
+            const mcqNavGrid = document.getElementById('mcq-nav-grid');
+            const essayNavGrid = document.getElementById('essay-nav-grid');
+
+            mcqNavGrid.innerHTML = '';
+            essayNavGrid.innerHTML = '';
+
+            // Render MCQ Nav 1-30
+            mcqQuestions.forEach((q, idx) => {
+                const btn = document.createElement('div');
+                btn.className = 'nav-item';
+                btn.id = `nav-mcq-${q.id}`;
+                btn.textContent = idx + 1;
+                btn.onclick = () => scrollToQuestion(`q-mcq-${q.id}`);
+                mcqNavGrid.appendChild(btn);
+            });
+
+            // Render Essay Nav 31-33
+            essayQuestions.forEach((eq, idx) => {
+                const btn = document.createElement('div');
+                btn.className = 'nav-item';
+                btn.id = `nav-essay-${eq.id}`;
+                btn.textContent = 30 + idx + 1;
+                btn.onclick = () => scrollToQuestion(`q-essay-${eq.id}`);
+                essayNavGrid.appendChild(btn);
+            });
+        }
+
+        function renderQuestionCards() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+
+            // 1. Render MCQs
+            mcqQuestions.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.id = `q-mcq-${q.id}`;
+
+                let diffBadge = '';
+                if (q.difficulty === 'easy') diffBadge = '<span class="badge badge-easy">Dễ</span>';
+                else if (q.difficulty === 'medium') diffBadge = '<span class="badge badge-medium">Trung Bình</span>';
+                else diffBadge = '<span class="badge badge-hard">Khó</span>';
+
+                let codeSnippetHtml = '';
+                if (q.code) {
+                    codeSnippetHtml = `<div class="code-block">${q.code}</div>`;
+                }
+
+                let optionsHtml = '';
+                const keys = ['A', 'B', 'C', 'D'];
+                q.options.forEach((optText, optIdx) => {
+                    optionsHtml += `
+                        <label class="option-label" id="label-mcq-${q.id}-${optIdx}" onclick="selectMcqOption(${q.id}, ${optIdx})">
+                            <input type="radio" name="mcq-${q.id}" value="${optIdx}">
+                            <span class="option-key">${keys[optIdx]}.</span>
+                            <span class="option-text">${escapeHtml(optText)}</span>
+                        </label>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="question-header">
+                        <div class="question-number">
+                            <span>Câu ${idx + 1}</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">(Trắc nghiệm)</span>
+                        </div>
+                        ${diffBadge}
+                    </div>
+                    <div class="question-text">${q.question}</div>
+                    ${codeSnippetHtml}
+                    <div class="options-list">
+                        ${optionsHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // 2. Render Essay Questions
+            essayQuestions.forEach((eq, idx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                card.id = `q-essay-${eq.id}`;
+
+                card.innerHTML = `
+                    <div class="question-header">
+                        <div class="question-number" style="color: var(--accent-purple);">
+                            <span>Câu ${30 + idx + 1}</span>
+                            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">(Tự luận / Lập trình)</span>
+                        </div>
+                        <span class="badge badge-essay">Tự Luận Code</span>
+                    </div>
+                    <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 10px; color: var(--text-main);">${eq.title}</div>
+                    <div class="question-text">${eq.prompt}</div>
+                    <div style="margin-top: 15px;">
+                        <textarea class="essay-input" id="essay-input-${eq.id}" 
+                            placeholder="Viết mã Python hoặc câu trả lời tự luận của bạn tại đây..."
+                            oninput="updateEssayAnswer(${eq.id}, this.value)"></textarea>
+                        <div class="essay-hint">
+                            <span>💡 Mẹo: Sử dụng phím Tab hoặc 4 khoảng trắng để thụt lề chuẩn Python.</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function scrollToQuestion(elementId) {
+            const elem = document.getElementById(elementId);
+            if (elem) {
+                elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /* ----------------------------------------------------
+           EVENT HANDLERS & PROGRESS UPDATES
+           ---------------------------------------------------- */
+        function selectMcqOption(questionId, optionIndex) {
+            if (isSubmitted) return;
+
+            userMcqAnswers[questionId] = optionIndex;
+
+            // Highlight UI option label
+            for (let i = 0; i < 4; i++) {
+                const lbl = document.getElementById(`label-mcq-${questionId}-${i}`);
+                if (lbl) {
+                    if (i === optionIndex) {
+                        lbl.classList.add('selected');
+                        lbl.querySelector('input').checked = true;
+                    } else {
+                        lbl.classList.remove('selected');
+                    }
+                }
+            }
+
+            // Update Nav item state
+            const navBtn = document.getElementById(`nav-mcq-${questionId}`);
+            if (navBtn) navBtn.classList.add('answered');
+
+            updateOverallProgress();
+        }
+
+        function updateEssayAnswer(essayId, textValue) {
+            if (isSubmitted) return;
+
+            if (textValue.trim() !== '') {
+                userEssayAnswers[essayId] = textValue;
+                const navBtn = document.getElementById(`nav-essay-${essayId}`);
+                if (navBtn) navBtn.classList.add('essay-answered');
+            } else {
+                delete userEssayAnswers[essayId];
+                const navBtn = document.getElementById(`nav-essay-${essayId}`);
+                if (navBtn) navBtn.classList.remove('essay-answered');
+            }
+
+            updateOverallProgress();
+        }
+
+        function updateOverallProgress() {
+            const answeredMcqCount = Object.keys(userMcqAnswers).length;
+            const answeredEssayCount = Object.keys(userEssayAnswers).length;
+            const totalAnswered = answeredMcqCount + answeredEssayCount;
+
+            document.getElementById('progress-text').textContent = `${totalAnswered} / 33 đã hoàn thành`;
+            const pct = Math.round((totalAnswered / 33) * 100);
+            document.getElementById('progress-bar-fill').style.width = `${pct}%`;
+        }
+
+        /* ----------------------------------------------------
+           SUBMISSION & MODAL LOGIC
+           ---------------------------------------------------- */
+        function openSubmitModal() {
+            if (isSubmitted) return;
+
+            const answeredMcqCount = Object.keys(userMcqAnswers).length;
+            const answeredEssayCount = Object.keys(userEssayAnswers).length;
+            const totalAnswered = answeredMcqCount + answeredEssayCount;
+            const totalUnanswered = 33 - totalAnswered;
+
+            let msg = `Bạn đã hoàn thành <strong>${totalAnswered}/33</strong> câu.`;
+            if (totalUnanswered > 0) {
+                msg += `<br><span style="color: var(--accent-red);">Cảnh báo: Còn ${totalUnanswered} câu chưa trả lời. Các câu bỏ trống sẽ bị tính 0 điểm!</span>`;
+            }
+            msg += `<br><br>Bạn có chắc chắn muốn nộp bài thi ngay bây giờ?`;
+
+            document.getElementById('modal-status-text').innerHTML = msg;
+            document.getElementById('confirm-modal').classList.add('active');
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('confirm-modal').classList.remove('active');
+        }
+
+        function confirmSubmit(isAuto = false) {
+            closeSubmitModal();
+            isSubmitted = true;
+            clearInterval(timerInterval);
+
+            // Hide Exam layout, show Result layout
+            document.getElementById('exam-header').style.display = 'none';
+            document.getElementById('exam-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            calculateAndRenderResults();
+        }
+
+        /* ----------------------------------------------------
+           GOOGLE SHEETS INTEGRATION
+           ---------------------------------------------------- */
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGr6qMkxlKl9DlYJVwNNzaNec5gmLEwPgczM6am5O-K-MfmGFdrAZJqFzAPifep38kQw/exec";
+
+        function guiKetQuaVeSheet(ketQua) {
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", // bắt buộc vì Apps Script không set CORS header
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({
+                    hoTen: ketQua.hoTen,
+                    diem: ketQua.diem,
+                    soCauDung: ketQua.soCauDung,
+                    tuLuan1: ketQua.tuLuan1,
+                    tuLuan2: ketQua.tuLuan2,
+                    tuLuan3: ketQua.tuLuan3
+                })
+            })
+            .then(function() {
+                console.log("Đã gửi kết quả bài thi về Google Sheet thành công!");
+            })
+            .catch(function(err) {
+                console.error("Lỗi gửi dữ liệu:", err);
+            });
+        }
+
+        /* ----------------------------------------------------
+           RESULT CALCULATION & REVIEW RENDER
+           ---------------------------------------------------- */
+        function calculateAndRenderResults() {
+            let correctMcqCount = 0;
+
+            mcqQuestions.forEach(q => {
+                const userChoice = userMcqAnswers[q.id];
+                if (userChoice !== undefined && userChoice === q.correct) {
+                    correctMcqCount++;
+                }
+            });
+
+            // Convert to 10-point and 100-point scale for MCQs
+            const score100 = Math.round((correctMcqCount / 30) * 100);
+            const score10 = ((correctMcqCount / 30) * 10).toFixed(1);
+
+            // Time Spent String
+            const spentMins = Math.floor(timeSpentSeconds / 60);
+            const spentSecs = timeSpentSeconds % 60;
+            const spentTimeStr = `${spentMins.toString().padStart(2, '0')}:${spentSecs.toString().padStart(2, '0')}`;
+
+            const unansweredTotal = 33 - (Object.keys(userMcqAnswers).length + Object.keys(userEssayAnswers).length);
+
+            // Update Result Header Summary
+            document.getElementById('result-student-info').textContent = `Học viên: ${studentName} | Ngày nộp: ${new Date().toLocaleDateString('vi-VN')} ${new Date().toLocaleTimeString('vi-VN')}`;
+            document.getElementById('score-val-10').textContent = score10;
+            document.getElementById('score-circle').style.setProperty('--score-pct', score100);
+            
+            document.getElementById('stat-correct-count').textContent = `${correctMcqCount} / 30`;
+            document.getElementById('stat-score-100').textContent = `${score100} / 100`;
+            document.getElementById('stat-time-spent').textContent = spentTimeStr;
+            document.getElementById('stat-unanswered').textContent = unansweredTotal;
+
+            // Grade evaluation text
+            let gradeText = "";
+            let gradeColor = "var(--accent-yellow)";
+            if (score100 >= 90) { gradeText = "🏆 Đánh giá: XUẤT SẮC"; gradeColor = "var(--accent-green)"; }
+            else if (score100 >= 75) { gradeText = "🌟 Đánh giá: GIỎI"; gradeColor = "#38bdf8"; }
+            else if (score100 >= 60) { gradeText = "👍 Đánh giá: KHÁ"; gradeColor = "var(--accent-yellow)"; }
+            else if (score100 >= 50) { gradeText = "👌 Đánh giá: TRUNG BÌNH"; gradeColor = "#f97316"; }
+            else { gradeText = "⚠️ Đánh giá: CẦN CỐ GẮNG HỌC LẠI KHÁI NIỆM"; gradeColor = "var(--accent-red)"; }
+
+            const gradeElem = document.getElementById('score-grade-text');
+            gradeElem.textContent = gradeText;
+            gradeElem.style.color = gradeColor;
+
+            // Send result payload to Google Sheet
+            const ketQuaPayload = {
+                hoTen: studentName,
+                diem: `${score10} (Thang 10) / ${score100} (Thang 100)`,
+                soCauDung: `${correctMcqCount}/30`,
+                tuLuan1: userEssayAnswers[31] || "(Bỏ trống)",
+                tuLuan2: userEssayAnswers[32] || "(Bỏ trống)",
+                tuLuan3: userEssayAnswers[33] || "(Bỏ trống)"
+            };
+            guiKetQuaVeSheet(ketQuaPayload);
+
+            // Render Detailed Review Items
+            renderReviewItems('all');
+        }
+
+        function filterReview(filterType, btnElem) {
+            // Active Tab UI
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(t => t.classList.remove('active'));
+            if (btnElem) btnElem.classList.add('active');
+
+            renderReviewItems(filterType);
+        }
+
+        function renderReviewItems(filter) {
+            const container = document.getElementById('review-container');
+            container.innerHTML = '';
+            const keys = ['A', 'B', 'C', 'D'];
+
+            // 1. Render MCQs Review
+            if (filter === 'all' || filter === 'correct' || filter === 'incorrect') {
+                mcqQuestions.forEach((q, idx) => {
+                    const userChoice = userMcqAnswers[q.id];
+                    const isCorrect = userChoice === q.correct;
+                    const isAnswered = userChoice !== undefined;
+
+                    if (filter === 'correct' && !isCorrect) return;
+                    if (filter === 'incorrect' && isCorrect) return;
+
+                    const card = document.createElement('div');
+                    card.className = `review-card ${isCorrect ? 'correct' : 'incorrect'}`;
+
+                    let statusBadge = isCorrect 
+                        ? `<span class="status-pill pass">✓ ĐÚNG</span>` 
+                        : `<span class="status-pill fail">✗ SAI / CHƯA CHỌN</span>`;
+
+                    let codeBlockHtml = q.code ? `<div class="code-block">${q.code}</div>` : '';
+
+                    let optionsReviewHtml = '<div style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;">';
+                    q.options.forEach((optText, optIdx) => {
+                        let optStyle = "padding: 8px 12px; border-radius: 6px; font-size: 0.9rem;";
+                        if (optIdx === q.correct) {
+                            optStyle += " background: rgba(74, 222, 128, 0.15); border: 1px solid var(--accent-green); color: #4ade80; font-weight: 600;";
+                        } else if (optIdx === userChoice && !isCorrect) {
+                            optStyle += " background: rgba(248, 113, 113, 0.15); border: 1px solid var(--accent-red); color: #f87171;";
+                        } else {
+                            optStyle += " background: rgba(255,255,255,0.02); color: var(--text-muted);";
+                        }
+
+                        let choiceTag = "";
+                        if (optIdx === userChoice) choiceTag += " 👈 (Bạn đã chọn)";
+                        if (optIdx === q.correct) choiceTag += " ✅ (Đáp án đúng)";
+
+                        optionsReviewHtml += `
+                            <div style="${optStyle}">
+                                <strong>${keys[optIdx]}.</strong> ${escapeHtml(optText)} ${choiceTag}
+                            </div>
+                        `;
+                    });
+                    optionsReviewHtml += '</div>';
+
+                    card.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                            <span style="font-weight: 700; color: var(--accent-blue);">Câu ${idx + 1} (Trắc nghiệm)</span>
+                            ${statusBadge}
+                        </div>
+                        <div style="font-weight: 600; color: var(--text-main); margin-bottom: 8px;">${q.question}</div>
+                        ${codeBlockHtml}
+                        ${optionsReviewHtml}
+                        <div class="explanation-box">
+                            <h5>💡 GIẢI THÍCH CHI TIẾT:</h5>
+                            ${q.explanation}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            // 2. Render Essay Review
+            if (filter === 'all' || filter === 'essay') {
+                essayQuestions.forEach((eq, idx) => {
+                    const userTyped = userEssayAnswers[eq.id] || "<i>(Học viên chưa nhập câu trả lời cho bài tập này)</i>";
+
+                    const card = document.createElement('div');
+                    card.className = 'review-card essay-item';
+
+                    card.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                            <span style="font-weight: 700; color: var(--accent-purple);">Câu ${30 + idx + 1}: ${eq.title}</span>
+                            <span class="badge badge-essay">Cần Giáo Viên Chấm Tay</span>
+                        </div>
+                        <div style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 15px;">${eq.prompt}</div>
+                        
+                        <div class="essay-comparison">
+                            <div class="essay-box">
+                                <h6>📝 BÀI LÀM CỦA HỌC VIÊN:</h6>
+                                <pre style="white-space: pre-wrap; font-size: 0.88rem; color: #f1f5f9;">${escapeHtml(userTyped)}</pre>
+                            </div>
+                            <div class="essay-box" style="border-color: rgba(74, 222, 128, 0.4);">
+                                <h6 style="color: var(--accent-green);">✅ ĐÁP ÁN VÀ CODE MẪU:</h6>
+                                <pre class="code-block" style="margin: 0; font-size: 0.85rem;">${escapeHtml(eq.sampleAnswer)}</pre>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box" style="margin-top: 15px;">
+                            <h5 style="color: var(--accent-purple);">📊 HUYÊN DẪN & MA TRẬN ĐỂ HỌC VIÊN TỰ ĐỐI CHIẾU CHẤM ĐIỂM:</h5>
+                            <pre style="font-family: inherit; font-size: 0.88rem; color: #cbd5e1; white-space: pre-wrap;">${eq.rubric}</pre>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
